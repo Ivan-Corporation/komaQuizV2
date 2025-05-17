@@ -18,9 +18,13 @@ app.include_router(auth_router, prefix="/auth")
 app.include_router(quiz.router, prefix="/quizzes")
 app.include_router(user.router, prefix="/users")
 
+origins = [
+    "http://localhost:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # or "*"
+    allow_origins=["http://localhost:5173"],  # or "*"
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

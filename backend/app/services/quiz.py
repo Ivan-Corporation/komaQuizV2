@@ -2,6 +2,10 @@ from sqlalchemy.orm import Session
 from app.models.quiz import Quiz, Question, Answer
 from app.schemas.quiz import QuizCreate
 from app.models.user import User
+from typing import List
+from app.schemas.quiz import QuizSubmissionAnswer, QuizSubmissionResult
+
+
 
 def create_quiz(db: Session, quiz_data: QuizCreate, owner: User) -> Quiz:
     quiz = Quiz(title=quiz_data.title, description=quiz_data.description, owner_id=owner.id)
@@ -65,3 +69,24 @@ def delete_quiz(db: Session, quiz_id: int, owner: User) -> bool:
     db.delete(quiz)
     db.commit()
     return True
+
+
+def evaluate_quiz_submission(db: Session, quiz_id: int, answers: List[QuizSubmissionAnswer]) -> QuizSubmissionResult:
+    question_map = {q.id: q for q in db.query(Question).filter(Question.quiz_id == quiz_id).all()}
+    answer_map = {a.id: a for a in db.query(Answer).filter(Answer.question_id.in_(question_map.keys())).all()}
+
+    correct = 0
+
+    for submission in answers:
+        answer = answer_map.get(submission.answer_id)
+        if answer and answer.is_correct and answer.question_id == submission.question_id:
+            correct += 1
+
+    total = len(question_map)
+    percent = (correct / total) * 100 if total else 0
+
+    return {
+        "total_questions": total,
+        "correct_answers": correct,
+        "score_percent": round(percent, 2)
+    }

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
+import api from '../api/axios';
 
 interface User {
   email: string;
@@ -19,7 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:8000/auth/login', {
+      const response = await api.post('http://localhost:8000/auth/login', {
         username: email,
         password,
       }, {

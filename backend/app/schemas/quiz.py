@@ -38,3 +38,24 @@ class QuizOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class QuizSubmissionAnswer(BaseModel):
+    question_id: int
+    answer_id: int
+
+class QuizSubmission(BaseModel):
+    answers: List[QuizSubmissionAnswer]
+
+class QuizSubmissionResult(BaseModel):
+    total_questions: int
+    correct_answers: int
+    score_percent: float
+
+    
+
+class QuizResult(BaseModel):
+    score: int
+    total: int
+    percentage: float
+
+    

@@ -6,8 +6,18 @@ from app.services.quiz import create_quiz, get_quiz_by_id, get_all_quizzes, upda
 from app.db import get_db
 from app.services.auth import get_current_user
 from app.models.user import User
+from pydantic import BaseModel
 
-router = APIRouter(prefix="/quizzes", tags=["quizzes"])
+router = APIRouter(tags=["quizzes"])
+
+
+class QuizSubmission(BaseModel):
+    answers: dict[int, int]  # {question_id: selected_answer_id}
+
+class QuizResult(BaseModel):
+    score: int
+    total: int
+    percentage: float
 
 @router.post("/", response_model=QuizOut)
 def create_new_quiz(
@@ -51,3 +61,16 @@ def delete_existing_quiz(
     if not success:
         raise HTTPException(status_code=404, detail="Quiz not found or not owned by user")
     return
+
+
+from app.schemas.quiz import QuizSubmission, QuizSubmissionResult
+from app.services.quiz import evaluate_quiz_submission
+
+@router.post("/{quiz_id}/submit", response_model=QuizSubmissionResult)
+def submit_quiz(
+    quiz_id: int,
+    submission: QuizSubmission,
+    db: Session = Depends(get_db),
+):
+    # Optional: you can add check here for quiz existence
+    return evaluate_quiz_submission(db, quiz_id, submission.answers)
