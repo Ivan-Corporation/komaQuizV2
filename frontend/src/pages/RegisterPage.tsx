@@ -32,7 +32,7 @@ export default function RegisterPage() {
         <h1 className="text-2xl font-bold text-center">Register</h1>
         {error && <div className="text-red-500 text-sm">{error}</div>}
         <input
-          className="w-full px-4 py-2 border rounded-lg"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           type="email"
           placeholder="Email"
           value={email}
@@ -40,7 +40,7 @@ export default function RegisterPage() {
           required
         />
         <input
-          className="w-full px-4 py-2 border rounded-lg"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           type="password"
           placeholder="Password"
           value={password}

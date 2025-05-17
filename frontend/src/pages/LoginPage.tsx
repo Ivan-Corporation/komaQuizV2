@@ -26,7 +26,7 @@ export default function LoginPage() {
       >
         <h1 className="text-2xl font-bold text-center">Login</h1>
         <input
-          className="w-full px-4 py-2 border rounded-lg"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           type="email"
           placeholder="Email"
           value={email}
@@ -34,7 +34,7 @@ export default function LoginPage() {
           required
         />
         <input
-          className="w-full px-4 py-2 border rounded-lg"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
           type="password"
           placeholder="Password"
           value={password}

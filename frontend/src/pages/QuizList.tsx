@@ -30,7 +30,7 @@ export default function QuizList() {
         {quizzes.map((quiz) => (
           <div
             key={quiz.id}
-            className="bg-white shadow-md rounded-2xl p-6 hover:shadow-lg transition"
+            className="bg-white shadow-md rounded-2xl p-6 hover:shadow-lg transition border border-gray-200"
           >
             <h2 className="text-xl font-semibold">{quiz.title}</h2>
             <p className="text-gray-600 mt-2">{quiz.description}</p>
