@@ -31,6 +31,10 @@ python -m venv env
 source env/bin/activate  # or .\\env\\Scripts\\activate on Windows 
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+
+alembic revision --autogenerate -m "Add quiz_submission table"
+alembic upgrade head
+
 uvicorn app.main:app --reload
 ```
 

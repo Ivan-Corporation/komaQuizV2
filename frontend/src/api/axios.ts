@@ -13,4 +13,23 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+
+// Handle 401 errors globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Clear local storage/token
+      localStorage.removeItem('token');
+
+      // Redirect to login
+      window.location.href = '/login'; // or use history.push if inside a React component
+
+      return Promise.reject(error); // optional: reject for further handling
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export default api;

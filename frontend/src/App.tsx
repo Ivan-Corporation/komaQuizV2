@@ -5,8 +5,11 @@ import PrivateRoute from "./components/PrivateRoute";
 import Header from "./components/Header";
 import { useAuthStore } from "./store/auth";
 import { useEffect } from "react";
-import QuizList from "./pages/QuizList";
+import QuizList from "./pages/QuizListPage";
 import QuizDetailPage from "./pages/QuizDetailPage";
+import DashboardPage from "./pages/DashboardPage";
+import ProfilePage from "./pages/ProfilePage";
+import ReviewPage from "./pages/ReviewPage";
 
 export default function App() {
   const loadUserFromStorage = useAuthStore(
@@ -24,9 +27,11 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<div>Dashboard</div>} />
-           <Route path="/quizzes" element={<QuizList />} />
-           <Route path="/quizzes/:id" element={<QuizDetailPage />} />
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/review/:id" element={<ReviewPage />} />
+          <Route path="/quizzes" element={<QuizList />} />
+          <Route path="/quizzes/:id" element={<QuizDetailPage />} />
         </Route>
       </Routes>
     </>

@@ -43,8 +43,7 @@ class QuizSubmissionAnswer(BaseModel):
     question_id: int
     answer_id: int
 
-class QuizSubmission(BaseModel):
-    answers: List[QuizSubmissionAnswer]
+
 
 class QuizSubmissionResult(BaseModel):
     total_questions: int

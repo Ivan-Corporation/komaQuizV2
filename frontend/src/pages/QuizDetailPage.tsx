@@ -5,7 +5,6 @@ import api from '../api/axios';
 interface Answer {
   id: number;
   text: string;
-  is_correct?: boolean;
 }
 
 interface Question {
@@ -21,10 +20,10 @@ interface Quiz {
   questions: Question[];
 }
 
-interface QuizResult {
-  score: number;
-  total: number;
-  percentage: number;
+interface SubmissionResult {
+  total_questions: number;
+  correct_answers: number;
+  score_percent: number;
   correctAnswers: { [questionId: number]: number };
 }
 
@@ -35,9 +34,10 @@ export default function QuizDetailPage() {
   const [started, setStarted] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [questionId: number]: number }>({});
-  const [result, setResult] = useState<QuizResult | null>(null);
+  const [result, setResult] = useState<SubmissionResult | null>(null);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -69,39 +69,47 @@ export default function QuizDetailPage() {
   };
 
   const handleSubmit = async () => {
+    if (!quiz) return;
+
+    const answers = Object.entries(selectedAnswers).map(([question_id, answer_id]) => ({
+      question_id: Number(question_id),
+      answer_id,
+    }));
+
     try {
-      const res = await api.post(`/quizzes/${id}/submit`, {
-        answers: selectedAnswers,
-        time: timeElapsed,
-      });
+      const res = await api.post(`/quizzes/${quiz.id}/submit`, { answers });
       setResult(res.data);
+      setSubmitted(true);
     } catch (err) {
-      console.error('Failed to submit quiz', err);
+      console.error('Submission failed:', err);
     }
   };
 
   if (loading) return <div className="p-4">Loading...</div>;
   if (!quiz) return <div className="p-4 text-red-500">Quiz not found.</div>;
 
-  if (result) {
+  if (submitted && result) {
     return (
-      <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow text-center">
-        <h2 className="text-2xl font-bold mb-4">Quiz Result</h2>
-        <p className="text-lg">Score: {result.score} / {result.total}</p>
-        <p className="text-lg">Percentage: {result.percentage}%</p>
+      <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-xl shadow">
+        <h2 className="text-2xl font-bold mb-4">Quiz Results</h2>
+        <p className="text-lg">Score: {result.correct_answers} / {result.total_questions}</p>
+        <p className="text-lg font-semibold text-green-600 mt-2">Percentage: {result.score_percent}%</p>
         <p className="text-lg mb-6">Time taken: {timeElapsed} seconds</p>
+
         <div className="text-left mt-6">
           {quiz.questions.map((question) => (
             <div key={question.id} className="mb-4">
               <p className="font-medium">{question.text}</p>
               {question.answers.map((answer) => {
                 const isSelected = selectedAnswers[question.id] === answer.id;
-                const isCorrect = result.correctAnswers[question.id] === answer.id;
+                const isCorrect = result.correctAnswers?.[question.id] === answer.id;
+
                 const classNames = [
                   'p-2 rounded border mt-1',
                   isCorrect ? 'bg-green-100 border-green-500' : '',
                   isSelected && !isCorrect ? 'bg-red-100 border-red-500' : '',
                 ].join(' ');
+
                 return (
                   <div key={answer.id} className={classNames}>
                     {answer.text}
@@ -111,6 +119,7 @@ export default function QuizDetailPage() {
             </div>
           ))}
         </div>
+
         <button
           onClick={() => window.location.reload()}
           className="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"

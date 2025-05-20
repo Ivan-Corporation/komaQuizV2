@@ -12,3 +12,4 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     quizzes = relationship("Quiz", back_populates="owner")
+    submissions = relationship("QuizSubmissionModel", back_populates="user")

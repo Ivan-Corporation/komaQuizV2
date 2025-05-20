@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Body
+from sqlalchemy import Column, DateTime, func
 from sqlalchemy.orm import Session
 from typing import List
 from app.schemas.quiz import QuizCreate, QuizOut
@@ -7,6 +8,9 @@ from app.db import get_db
 from app.services.auth import get_current_user
 from app.models.user import User
 from pydantic import BaseModel
+from app.models.quiz_submission import QuizSubmissionModel
+from app.schemas.submission import QuizSubmissionCreate, QuizSubmissionOut
+from datetime import datetime
 
 router = APIRouter(tags=["quizzes"])
 
@@ -63,14 +67,41 @@ def delete_existing_quiz(
     return
 
 
-from app.schemas.quiz import QuizSubmission, QuizSubmissionResult
-from app.services.quiz import evaluate_quiz_submission
 
-@router.post("/{quiz_id}/submit", response_model=QuizSubmissionResult)
+
+@router.post("/{quiz_id}/submit", response_model=QuizSubmissionOut)
 def submit_quiz(
     quiz_id: int,
-    submission: QuizSubmission,
+    data: QuizSubmissionCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    # Optional: you can add check here for quiz existence
-    return evaluate_quiz_submission(db, quiz_id, submission.answers)
+    quiz = get_quiz_by_id(db, quiz_id)
+    if not quiz:
+        raise HTTPException(404, detail="Quiz not found")
+
+    total = len(quiz.questions)
+    correct = 0
+
+    # Convert list to dict for easier lookup
+    answer_map = {item.question_id: item.answer_id for item in data.answers}
+
+    for question in quiz.questions:
+        correct_answer = next((a for a in question.answers if a.is_correct), None)
+        selected_id = answer_map.get(question.id)
+        if correct_answer and selected_id == correct_answer.id:
+            correct += 1
+
+    submission = QuizSubmissionModel(
+        user_id=current_user.id,
+        quiz_id=quiz.id,
+        score=correct,
+        correct_answers=correct,
+        total_questions=total,
+        answers=answer_map,  # stored as JSON
+        submitted_at=datetime.utcnow()
+    )
+    db.add(submission)
+    db.commit()
+    db.refresh(submission)
+    return submission
