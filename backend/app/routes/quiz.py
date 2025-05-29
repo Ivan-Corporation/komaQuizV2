@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from app.models.quiz_submission import QuizSubmissionModel
 from app.schemas.submission import QuizSubmissionCreate, QuizSubmissionOut
 from datetime import datetime
+from app.utils.experience import award_experience_and_achievements
 
 router = APIRouter(tags=["quizzes"])
 
@@ -80,10 +81,18 @@ def submit_quiz(
     if not quiz:
         raise HTTPException(404, detail="Quiz not found")
 
+    # ❌ Prevent duplicate submission
+    existing = db.query(QuizSubmissionModel).filter_by(
+        user_id=current_user.id,
+        quiz_id=quiz.id,
+        is_generated=False
+    ).first()
+    if existing:
+        raise HTTPException(400, detail="You have already submitted this quiz.")
+
     total = len(quiz.questions)
     correct = 0
 
-    # Convert list to dict for easier lookup
     answer_map = {item.question_id: item.answer_id for item in data.answers}
 
     for question in quiz.questions:
@@ -98,10 +107,13 @@ def submit_quiz(
         score=correct,
         correct_answers=correct,
         total_questions=total,
-        answers=answer_map,  # stored as JSON
+        answers=answer_map,
         submitted_at=datetime.utcnow()
     )
     db.add(submission)
+
+    award_experience_and_achievements(current_user, submission, db)
+
     db.commit()
     db.refresh(submission)
     return submission

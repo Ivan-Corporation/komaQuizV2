@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 
 class QuizAnswer(BaseModel):
@@ -12,11 +12,11 @@ class QuizSubmissionCreate(BaseModel):
 class QuizSubmissionOut(BaseModel):
     id: int
     user_id: int
-    quiz_id: int
+    quiz_id: Optional[int]
     score: int
     correct_answers: int
     total_questions: int
-    submitted_at: datetime
+    submitted_at: Optional[datetime]
 
     class Config:
         from_attributes = True

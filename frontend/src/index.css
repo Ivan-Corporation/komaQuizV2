@@ -1,17 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
 @import "tailwindcss";
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-main: 'Orbitron', system-ui, sans-serif;
+  font-family: var(--font-main);
+  font-size: 16px;
   line-height: 1.5;
   font-weight: 400;
+  height: 100%;
 
+  /* Theme Colors */
   color-scheme: light dark;
-  color: black;
-  background-color: #242424;
+  --color-text: #eaeaea;
+  --color-bg: #0f0f0f;
+  --color-accent: #6366f1;
+  --color-secondary: #22d3ee;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Motion and Radius */
+  --transition: 0.3s ease-in-out;
+  --border-radius: 0.75rem;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #0f0f0f 100%);
+  background-attachment: fixed;
+  color: var(--color-text);
+  font-family: var(--font-main);
+  transition: background-color var(--transition), color var(--transition);
+}
+
+/* Subtle Glow Effect */
+.glow {
+  text-shadow: 0 0 5px var(--color-accent), 0 0 10px var(--color-accent);
+}
+
+/* Hero Background Animation (optional grid pulse) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                    radial-gradient(circle at 80% 80%, rgba(34, 211, 238, 0.08) 0%, transparent 40%);
+  animation: bgPulse 10s infinite alternate ease-in-out;
+  z-index: -1;
+}
+
+@keyframes bgPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}

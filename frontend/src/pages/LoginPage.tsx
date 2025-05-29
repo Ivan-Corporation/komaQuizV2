@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/auth";
+import Input from "../UI/Input";
+import Button from "../UI/Button";
+import { Mail, Lock } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -19,38 +23,41 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
+    <div className="flex flex-col justify-center items-center h-screen px-4 bg-gradient-to-br from-[#0f0f0f] via-[#1a1a2e] to-[#0f0f0f]">
+      <motion.form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-xl shadow-lg w-96 space-y-4"
+        initial={{ opacity: 0, y: -40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="bg-[#1a1a1a] border border-gray-800 p-6 rounded-2xl shadow-xl w-full max-w-md space-y-4 text-white"
       >
-        <h1 className="text-2xl font-bold text-center">Login</h1>
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+        <h1 className="text-3xl font-bold text-center glow">KomaQuizV2</h1>
+
+        <Input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          icon={<Mail size={18} />}
         />
-        <input
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+
+        <Input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          icon={<Lock size={18} />}
+          isPassword
         />
-        <button
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
-          type="submit"
-        >
-          Login
-        </button>
-      </form>
-      <p className="text-sm text-center">
+
+        <Button type="submit">Login</Button>
+      </motion.form>
+
+      <p className="text-sm text-gray-400 mt-4">
         Don’t have an account?{" "}
-        <a href="/register" className="text-blue-600 hover:underline">
+        <a href="/register" className="text-indigo-400 hover:underline">
           Register here
         </a>
       </p>

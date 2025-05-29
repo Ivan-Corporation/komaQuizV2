@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { Link } from "react-router-dom";
+import AiAnalyticsDashboard from "../components/AiAnalyticsDashboard";
+import { motion } from "framer-motion";
 
 interface Submission {
   id: number;
@@ -16,6 +18,9 @@ interface User {
   email: string;
   is_active: boolean;
   created_at: string;
+  level: number;
+  experience_points: number;
+  achievements?: string[];
 }
 
 export default function ProfilePage() {
@@ -43,52 +48,88 @@ export default function ProfilePage() {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-4">
-      <h1 className="text-2xl font-bold mb-6">My Quiz History</h1>
+    <div className="max-w-4xl mx-auto mt-12 px-4">
+      <h1 className="text-3xl font-bold text-white mb-8">My Quiz History</h1>
 
       {loading ? (
-        <p>Loading...</p>
-      ) : submissions.length === 0 ? (
-        <p>No quiz attempts yet.</p>
+        <p className="text-gray-400">Loading...</p>
       ) : (
-        <div className="space-y-4">
+        <>
           {user && (
-            <div className="mb-8 p-4 bg-gray-100 rounded shadow">
-              <h2 className="text-xl font-semibold mb-1">Profile</h2>
-              <p>
-                <span className="font-medium">Email:</span> {user.email}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="mb-6 p-6 rounded-xl bg-[#1f1f1f] border border-gray-700 text-white shadow-md"
+            >
+              <h2 className="text-xl font-semibold mb-2">Profile</h2>
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">Email:</span>{" "}
+                {user.email}
               </p>
-              <p>
-                <span className="font-medium">Account created:</span>{" "}
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">Joined:</span>{" "}
                 {new Date(user.created_at).toLocaleDateString()}
               </p>
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">Level:</span>{" "}
+                {user.level}
+              </p>
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">XP:</span>{" "}
+                {user.experience_points}
+              </p>
+            </motion.div>
+          )}
+          {user?.achievements && user.achievements.length > 0 && (
+            <div className="mt-3">
+              <h3 className="text-sm font-semibold text-white mb-1">
+                Achievements
+              </h3>
+              <ul className="list-disc list-inside text-sm text-gray-300">
+                {user.achievements.map((ach, idx) => (
+                  <li key={idx}>{ach}</li>
+                ))}
+              </ul>
             </div>
           )}
-          {submissions.map((submission) => (
-            <div
-              key={submission.id}
-              className="p-4 bg-white rounded shadow flex justify-between items-center"
-            >
-              <div>
-                <p className="font-semibold">Quiz ID: {submission.quiz_id}</p>
-                <p className="text-sm text-gray-600">
-                  Score: {submission.correct_answers} /{" "}
-                  {submission.total_questions}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Submitted:{" "}
-                  {new Date(submission.submitted_at).toLocaleString()}
-                </p>
-              </div>
-              <Link
-                to={`/review/${submission.id}`}
-                className="text-blue-600 hover:underline font-medium"
-              >
-                Review
-              </Link>
+          <AiAnalyticsDashboard />
+
+          {submissions.length === 0 ? (
+            <p className="text-gray-400 mt-4">No quiz attempts yet.</p>
+          ) : (
+            <div className="space-y-4 mt-6">
+              {submissions.map((submission) => (
+                <motion.div
+                  key={submission.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-5 rounded-xl bg-[#262626] border border-gray-700 flex justify-between items-center text-white"
+                >
+                  <div>
+                    <p className="font-semibold">
+                      Quiz ID: {submission.quiz_id}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      Score: {submission.correct_answers} /{" "}
+                      {submission.total_questions}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(submission.submitted_at).toLocaleString()}
+                    </p>
+                  </div>
+                  <Link
+                    to={`/review/${submission.id}`}
+                    className="text-indigo-400 hover:underline text-sm"
+                  >
+                    Review
+                  </Link>
+                </motion.div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

@@ -57,4 +57,14 @@ class QuizResult(BaseModel):
     total: int
     percentage: float
 
+
+
+class GeneratedQuizQuestion(BaseModel):
+    question: str
+    options: List[str]
+    correct_index: int
+
+class GeneratedQuizSubmission(BaseModel):
+    questions: List[GeneratedQuizQuestion]
+    user_answers: List[int]  # Indexes chosen by the user    
     

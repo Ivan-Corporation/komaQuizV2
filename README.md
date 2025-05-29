@@ -86,7 +86,7 @@ You can rewrite the backend in:
 - [x] Achievements by theme & global
 - [ ] AI-based quiz generation (OpenAI)
 - [ ] Web3 token rewards (NFTs or SBTs)
-- [ ] Leaderboards & user streaks
+- [ ] Leaderboards
 
 ---
 

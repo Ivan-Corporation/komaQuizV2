@@ -10,6 +10,7 @@ import QuizDetailPage from "./pages/QuizDetailPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import ReviewPage from "./pages/ReviewPage";
+import AIGeneratePage from "./pages/AIGeneratePage";
 
 export default function App() {
   const loadUserFromStorage = useAuthStore(
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/review/:id" element={<ReviewPage />} />
           <Route path="/quizzes" element={<QuizList />} />
           <Route path="/quizzes/:id" element={<QuizDetailPage />} />
+          <Route path="/generate" element={<AIGeneratePage />} />
         </Route>
       </Routes>
     </>

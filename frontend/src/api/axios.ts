@@ -1,31 +1,50 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000', // or your backend URL
+  baseURL: 'http://localhost:8000',
+  withCredentials: true, // needed to send HttpOnly cookies (refresh token)
 });
 
-// Add token to Authorization header
+// Attach access token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
+  if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-
-// Handle 401 errors globally
+// Handle 401 with refresh logic
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Clear local storage/token
-      localStorage.removeItem('token');
+  async (error) => {
+    const originalRequest = error.config;
 
-      // Redirect to login
-      window.location.href = '/login'; // or use history.push if inside a React component
+    // Prevent infinite loop
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-      return Promise.reject(error); // optional: reject for further handling
+      try {
+        // Request a new access token
+        const res = await axios.post('http://localhost:8000/auth/refresh', {}, { withCredentials: true });
+
+        const newToken = res.data.access_token;
+
+        // Store new token
+        localStorage.setItem('token', newToken);
+
+        // Set Authorization header again
+        api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+
+        // Retry original request
+        return api(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, clear token and redirect
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
     }
 
     return Promise.reject(error);

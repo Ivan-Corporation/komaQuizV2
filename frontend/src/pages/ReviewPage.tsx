@@ -2,31 +2,29 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 
-interface Answer {
-  id: number;
-  text: string;
-  is_correct: boolean;
-}
-
-interface Question {
-  id: number;
-  text: string;
-  answers: Answer[];
-}
-
-interface Quiz {
-  id: number;
-  title: string;
-  questions: Question[];
-}
-
 interface Submission {
   id: number;
   answers: Record<number, number>;
   correct_answers: number;
   total_questions: number;
   submitted_at: string;
-  quiz: Quiz;
+  quiz?: {
+    title: string;
+    questions: {
+      id: number;
+      text: string;
+      answers: {
+        id: number;
+        text: string;
+        is_correct: boolean;
+      }[];
+    }[];
+  };
+  ai_questions?: {
+    question: string;
+    options: string[];
+    correct_index: number;
+  }[];
 }
 
 export default function ReviewPage() {
@@ -49,7 +47,9 @@ export default function ReviewPage() {
 
   return (
     <div className="max-w-2xl mx-auto mt-8 p-4 bg-white rounded-xl shadow">
-      <h1 className="text-xl font-bold mb-4">{submission.quiz.title}</h1>
+      <h1 className="text-xl font-bold mb-4">
+        {submission.quiz?.title ?? 'AI Generated Quiz'}
+      </h1>
       <p className="text-gray-600 mb-2">
         Submitted: {new Date(submission.submitted_at).toLocaleString()}
       </p>
@@ -57,28 +57,60 @@ export default function ReviewPage() {
         Score: {submission.correct_answers} / {submission.total_questions}
       </p>
 
-      {submission.quiz.questions.map((question) => (
-        <div key={question.id} className="mb-6">
-          <p className="font-medium mb-1">{question.text}</p>
-          {question.answers.map((answer) => {
-            const selectedId = submission.answers[question.id];
-            const isCorrect = answer.is_correct;
-            const isSelected = answer.id === selectedId;
+      {/* AI QUIZ REVIEW */}
+      {submission.ai_questions &&
+        submission.ai_questions.map((q, idx) => {
+          const selected = submission.answers[idx];
+          return (
+            <div key={idx} className="mb-6">
+              <p className="font-medium mb-1">
+                {idx + 1}. {q.question}
+              </p>
+              {q.options.map((opt, i) => {
+                const isCorrect = i === q.correct_index;
+                const isSelected = i === selected;
+                const bg = isCorrect
+                  ? 'bg-green-100 border-green-500'
+                  : isSelected
+                  ? 'bg-red-100 border-red-500'
+                  : 'bg-white';
 
-            const bg = isCorrect
-              ? 'bg-green-100 border-green-500'
-              : isSelected
-              ? 'bg-red-100 border-red-500'
-              : 'bg-white';
+                return (
+                  <div key={i} className={`p-2 border rounded mt-1 ${bg}`}>
+                    {opt}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
 
-            return (
-              <div key={answer.id} className={`p-2 border rounded mt-1 ${bg}`}>
-                {answer.text}
-              </div>
-            );
-          })}
-        </div>
-      ))}
+      {/* NORMAL QUIZ REVIEW */}
+      {submission.quiz &&
+        submission.quiz.questions.map((q) => {
+          const selectedId = submission.answers[q.id];
+          return (
+            <div key={q.id} className="mb-6">
+              <p className="font-medium mb-1">{q.text}</p>
+              {q.answers.map((a) => {
+                const isCorrect = a.is_correct;
+                const isSelected = a.id === selectedId;
+
+                const bg = isCorrect
+                  ? 'bg-green-100 border-green-500'
+                  : isSelected
+                  ? 'bg-red-100 border-red-500'
+                  : 'bg-white';
+
+                return (
+                  <div key={a.id} className={`p-2 border rounded mt-1 ${bg}`}>
+                    {a.text}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
     </div>
   );
 }
