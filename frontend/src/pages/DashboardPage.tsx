@@ -1,27 +1,57 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, User, BrainCircuit } from "lucide-react";
+import {
+  Sparkles,
+  User,
+  BrainCircuit,
+  Trophy,
+  TrophyIcon,
+  Users,
+} from "lucide-react";
 import Button from "../UI/Button";
+import { useUserInfo } from "../hooks/useUserInfo";
 
 export default function Dashboard() {
+  const userInfo = useUserInfo();
+  const userLevel = userInfo?.level || 0;
+
   const actions = [
     {
       to: "/quizzes",
       icon: <Sparkles size={32} className="text-indigo-400" />,
       title: "Start Quiz",
-      desc: "Dive into AI-powered quizzes",
+      desc: "Hardcore manual quizzes",
+      locked: userLevel < 100,
+      lockNote: "Level 100 required",
     },
     {
       to: "/generate",
       icon: <BrainCircuit size={32} className="text-green-400" />,
-      title: "Generate Quiz",
-      desc: "Create your own smart quizzes",
+      title: "AI-powered Quiz",
+      desc: "Dive into AI-powered quizzes",
+      locked: false,
     },
     {
       to: "/profile",
-      icon: <User size={32} className="text-yellow-400" />,
+      icon: <User size={32} className="text-blue-400" />,
       title: "Profile",
       desc: "Manage your account & stats",
+      locked: false,
+    },
+    {
+      to: "/leaderboard",
+      icon: <Users size={32} className="text-purple-400" />,
+      title: "Leaderboard",
+      desc: "Top scorers in the community",
+      locked: true,
+      lockNote: "Locked",
+    },
+    {
+      to: "/achievements",
+      icon: <TrophyIcon size={32} className="text-yellow-400" />,
+      title: "Achievements",
+      desc: "Achievements description and rewards",
+      locked: false,
     },
   ];
 
@@ -48,26 +78,76 @@ export default function Dashboard() {
           },
         }}
       >
-        {actions.map((action, idx) => (
-          <motion.div
-            key={idx}
-            variants={{
-              hidden: { opacity: 0, y: 0 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            whileHover={{ scale: 1.03 }}
-            className="bg-[#1f1f1f] border border-gray-700 p-6 rounded-2xl shadow-md flex flex-col items-start justify-between space-y-4 hover:shadow-[0_0_12px_rgba(99,102,241,0.2)] transition"
-          >
-            <div>{action.icon}</div>
-            <div>
-              <h2 className="text-xl font-semibold">{action.title}</h2>
-              <p className="text-gray-400 text-sm mt-1">{action.desc}</p>
-            </div>
-            <Link to={action.to} className="w-full">
-              <Button className="w-full">{action.title}</Button>
-            </Link>
-          </motion.div>
-        ))}
+        {actions.map((action, idx) => {
+          const isAIQuiz = action.title === "AI-powered Quiz";
+
+          return (
+            <motion.div
+              key={idx}
+              variants={{
+                hidden: { opacity: 0, y: 0 },
+                visible: { opacity: 1, y: 0 },
+              }}
+              whileHover={!action.locked ? { scale: 1.05 } : {}}
+              className={`relative p-6 rounded-2xl border shadow-md flex flex-col items-start justify-between space-y-4 transition duration-300 ${
+                action.locked
+                  ? "opacity-40 pointer-events-none bg-[#1f1f1f] border-gray-700"
+                  : isAIQuiz
+                  ? "bg-gradient-to-br from-[#111827] via-[#1e3a8a] to-[#0f172a] border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.4)] card-shine"
+                  : "bg-[#1f1f1f] border-gray-700 hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]"
+              }`}
+            >
+              {isAIQuiz && (
+                <span className="absolute top-3 right-3 bg-indigo-600 text-xs px-2 py-1 rounded-md font-semibold shadow-md">
+                  ⚡ Recommended
+                </span>
+              )}
+
+              <div className="flex items-center gap-2">
+                {action.icon}
+                {action.locked && (
+                  <span className="text-xs text-red-500 font-semibold">
+                    🔒 {action.lockNote}
+                  </span>
+                )}
+              </div>
+
+              <div>
+                <h2
+                  className={`text-xl font-semibold ${
+                    isAIQuiz ? "text-indigo-300" : ""
+                  }`}
+                >
+                  {action.title}
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">
+                  {isAIQuiz
+                    ? "Let AI craft a quiz tailored to your skills"
+                    : action.desc}
+                </p>
+              </div>
+
+              {action.locked ? (
+                <button
+                  className="w-full bg-gray-700 text-gray-400 py-2 px-4 rounded-md cursor-not-allowed"
+                  disabled
+                >
+                  Locked
+                </button>
+              ) : (
+                <Link to={action.to} className="w-full">
+                  <Button
+                    className={`w-full ${
+                      isAIQuiz ? "bg-indigo-600 hover:bg-indigo-500" : ""
+                    }`}
+                  >
+                    {action.title}
+                  </Button>
+                </Link>
+              )}
+            </motion.div>
+          );
+        })}
       </motion.div>
     </div>
   );

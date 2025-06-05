@@ -62,3 +62,39 @@ body::before {
     opacity: 1;
   }
 }
+
+
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 70%
+  );
+  transform: rotate(25deg);
+  animation: shine 3s ease-in-out infinite;
+
+  pointer-events: none; 
+  z-index: 0; 
+}
+
+
+@keyframes shine {
+  0% {
+    transform: rotate(25deg) translateX(-100%);
+  }
+  100% {
+    transform: rotate(25deg) translateX(100%);
+  }
+}
