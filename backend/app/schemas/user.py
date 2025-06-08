@@ -15,6 +15,11 @@ class UserOut(BaseModel):
     achievements: List[str]
     level: int
     topic_experience: Dict[str, int]
+    wallet_address: str
     
     class Config:
         orm_mode = True
+
+
+class WalletConnectRequest(BaseModel):
+    wallet_address: str

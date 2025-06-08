@@ -17,6 +17,29 @@ export default function Dashboard() {
 
   const actions = [
     {
+      to: "/generate",
+      icon: <BrainCircuit size={32} className="text-green-400" />,
+      title: "AI-powered Quiz",
+      desc: "Dive into AI-powered quizzes",
+      locked: false,
+    },
+
+    {
+      to: "/profile",
+      icon: <User size={32} className="text-blue-400" />,
+      title: "Profile",
+      desc: "Manage your account & stats",
+      locked: false,
+    },
+
+    {
+      to: "/achievements",
+      icon: <TrophyIcon size={32} className="text-yellow-400" />,
+      title: "Achievements",
+      desc: "Achievements description and rewards",
+      locked: false,
+    },
+    {
       to: "/quizzes",
       icon: <Sparkles size={32} className="text-indigo-400" />,
       title: "Start Quiz",
@@ -25,33 +48,12 @@ export default function Dashboard() {
       lockNote: "Level 100 required",
     },
     {
-      to: "/generate",
-      icon: <BrainCircuit size={32} className="text-green-400" />,
-      title: "AI-powered Quiz",
-      desc: "Dive into AI-powered quizzes",
-      locked: false,
-    },
-    {
-      to: "/profile",
-      icon: <User size={32} className="text-blue-400" />,
-      title: "Profile",
-      desc: "Manage your account & stats",
-      locked: false,
-    },
-    {
       to: "/leaderboard",
       icon: <Users size={32} className="text-purple-400" />,
       title: "Leaderboard",
       desc: "Top scorers in the community",
       locked: true,
       lockNote: "Locked",
-    },
-    {
-      to: "/achievements",
-      icon: <TrophyIcon size={32} className="text-yellow-400" />,
-      title: "Achievements",
-      desc: "Achievements description and rewards",
-      locked: false,
     },
   ];
 

@@ -18,3 +18,4 @@ class User(Base):
     achievements = Column(MutableList.as_mutable(JSON), default=list)
     level = Column(Integer, default=1, nullable=False)
     topic_experience = Column(MutableDict.as_mutable(JSON), default=dict)
+    wallet_address = Column(String, unique=True, nullable=True)

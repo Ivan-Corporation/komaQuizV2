@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import AiAnalyticsDashboard from "../components/AiAnalyticsDashboard";
 import { motion } from "framer-motion";
 import { useUserInfo } from "../hooks/useUserInfo"; // make sure path is correct
+import { useAppKitAccount } from "@reown/appkit/react";
 
 interface Submission {
   id: number;
@@ -70,6 +71,7 @@ export default function ProfilePage() {
   const user = useUserInfo();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const { address, isConnected } = useAppKitAccount();
 
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -101,10 +103,28 @@ export default function ProfilePage() {
             className="mb-6 p-6 rounded-xl bg-[#1f1f1f] border border-gray-700 text-white shadow-md"
           >
             <h2 className="text-xl font-semibold mb-2">Profile</h2>
+            <p className="text-sm text-gray-300 flex items-center gap-2">
+              <span className="font-medium text-white">Wallet:</span>{" "}
+              {isConnected ? (
+                <>
+                  <span className="text-green-400 truncate max-w-[160px]">
+                    {address}
+                  </span>
+                  <span className="bg-green-600 text-[8px] px-2 py-0.5 rounded-full">
+                    Connected
+                  </span>
+                </>
+              ) : (
+                <span className="bg-red-600 text-white text-[8px] px-2 py-0.5 rounded-full">
+                  Disconnected
+                </span>
+              )}
+            </p>
             <p className="text-sm text-gray-300">
               <span className="font-medium text-white">Email:</span>{" "}
               {user.email}
             </p>
+
             <p className="text-sm text-gray-300">
               <span className="font-medium text-white">Joined:</span>{" "}
               {new Date(user.created_at).toLocaleDateString()}

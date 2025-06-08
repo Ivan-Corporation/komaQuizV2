@@ -6,7 +6,7 @@ from app.services.auth import get_current_user
 from app.schemas.submission import QuizSubmissionOut
 from app.models.user import User
 from typing import List
-from app.schemas.user import UserOut
+from app.schemas.user import UserOut, WalletConnectRequest
 
 router = APIRouter(tags=["users"])
 
@@ -21,3 +21,14 @@ def get_my_submissions(
 @router.get("/me", response_model=UserOut)
 def get_my_profile(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.post("/me/wallet")
+def connect_wallet(
+    data: WalletConnectRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    current_user.wallet_address = data.wallet_address.lower()
+    db.commit()
+    return {"message": "Wallet connected successfully"}
