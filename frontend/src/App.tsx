@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import PrivateRoute from "./components/PrivateRoute";
@@ -13,12 +13,24 @@ import ReviewPage from "./pages/ReviewPage";
 import AIGeneratePage from "./pages/AIGeneratePage";
 import AchievementsPage from "./pages/AchievementsPage";
 
-
-
 export default function App() {
   const loadUserFromStorage = useAuthStore(
     (state) => state.loadUserFromStorage
   );
+
+  const logout = useAuthStore((state) => state.logout);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleTokenExpired = () => {
+      logout();
+      navigate("/login");
+    };
+
+    window.addEventListener("token-expired", handleTokenExpired);
+    return () =>
+      window.removeEventListener("token-expired", handleTokenExpired);
+  }, [logout, navigate]);
 
   useEffect(() => {
     loadUserFromStorage();

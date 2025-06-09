@@ -42,7 +42,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // If refresh fails, clear token and redirect
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        window.dispatchEvent(new Event('token-expired'));
         return Promise.reject(refreshError);
       }
     }

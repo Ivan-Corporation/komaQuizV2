@@ -110,7 +110,7 @@ export default function ProfilePage() {
                   <span className="text-green-400 truncate max-w-[160px]">
                     {address}
                   </span>
-                  <span className="bg-green-600 text-[8px] px-2 py-0.5 rounded-full">
+                  <span className="bg-green-600 text-white text-[8px] px-2 py-0.5 rounded-full">
                     Connected
                   </span>
                 </>

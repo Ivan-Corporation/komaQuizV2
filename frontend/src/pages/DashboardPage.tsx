@@ -28,7 +28,7 @@ export default function Dashboard() {
       to: "/profile",
       icon: <User size={32} className="text-blue-400" />,
       title: "Profile",
-      desc: "Manage your account & stats",
+      desc: "Manage your account, achievements, and quiz history",
       locked: false,
     },
 
