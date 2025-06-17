@@ -24,16 +24,21 @@ export default function App() {
   const logout = useAuthStore((state) => state.logout);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleTokenExpired = () => {
-      logout();
-      navigate("/login");
-    };
+useEffect(() => {
+  const handleTokenExpired = () => {
+    logout();
 
-    window.addEventListener("token-expired", handleTokenExpired);
-    return () =>
-      window.removeEventListener("token-expired", handleTokenExpired);
-  }, [logout]);
+    // Only navigate to /login if not already there or on public pages
+    if (!window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
+      navigate("/login");
+    }
+  };
+
+  window.addEventListener("token-expired", handleTokenExpired);
+  return () =>
+    window.removeEventListener("token-expired", handleTokenExpired);
+}, [logout, navigate]);
+
 
   useEffect(() => {
     loadUserFromStorage();
