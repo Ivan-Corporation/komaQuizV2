@@ -33,7 +33,7 @@ export default function App() {
     window.addEventListener("token-expired", handleTokenExpired);
     return () =>
       window.removeEventListener("token-expired", handleTokenExpired);
-  }, [logout, navigate]);
+  }, [logout]);
 
   useEffect(() => {
     loadUserFromStorage();
