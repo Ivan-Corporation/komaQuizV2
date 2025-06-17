@@ -23,11 +23,14 @@ app.include_router(analytics.router)
 
 origins = [
     "http://localhost:5173",
+    "https://koma-quiz-v2.vercel.app"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # or "*"
+    allow_origins=[    
+        "http://localhost:5173",
+        "https://koma-quiz-v2.vercel.app"],  # or "*"
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

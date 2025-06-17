@@ -5,6 +5,7 @@ import Input from "../UI/Input";
 import Button from "../UI/Button";
 import { Mail, Lock } from "lucide-react";
 import { motion } from "framer-motion";
+import { API_BASE_URL } from "../config";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -16,7 +17,7 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     try {
-      await axios.post("http://localhost:8000/auth/register", {
+      await axios.post(`${API_BASE_URL}/auth/register`, {
         email,
         password,
       });

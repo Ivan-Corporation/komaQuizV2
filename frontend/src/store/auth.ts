@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import api from '../api/axios';
+import { API_BASE_URL } from '../config';
 
 interface User {
   email: string;
@@ -19,7 +20,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (email, password) => {
     try {
-      const response = await api.post('http://localhost:8000/auth/login', {
+      const response = await api.post(`${API_BASE_URL}/auth/login`, {
         username: email,
         password,
       }, {

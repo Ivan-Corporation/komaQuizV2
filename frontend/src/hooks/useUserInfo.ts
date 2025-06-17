@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
+import { API_BASE_URL } from '../config';
 
 export const useUserInfo = () => {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -8,7 +9,7 @@ export const useUserInfo = () => {
     const fetchUserInfo = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await api.get('http://localhost:8000/users/me', {
+        const res = await api.get(`${API_BASE_URL}/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
