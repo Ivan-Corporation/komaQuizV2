@@ -1,0 +1,88 @@
+<svg
+  width="120"
+  height="120"
+  viewBox="0 0 120 120"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Outer glowing circle -->
+  <circle
+    cx="60"
+    cy="60"
+    r="54"
+    stroke="url(#outerGradient)"
+    stroke-width="6"
+    filter="url(#outerGlow)"
+  />
+  
+  <!-- Background polygon for depth -->
+  <polygon
+    points="60,12 94,30 106,68 86,102 50,114 22,92 14,56 34,20"
+    fill="url(#polyGradient)"
+    opacity="0.15"
+  />
+  
+  <!-- Inner circle -->
+  <circle cx="60" cy="60" r="42" fill="#1e3c72" />
+  
+  <!-- Big stylized Q -->
+  <text
+    x="60"
+    y="68"
+    text-anchor="middle"
+    fill="url(#textGradient)"
+    font-family="'Georgia', serif"
+    font-size="56"
+    font-weight="900"
+    dominant-baseline="middle"
+  >
+    Q
+  </text>
+  
+  <defs>
+    <linearGradient
+      id="outerGradient"
+      x1="0"
+      y1="0"
+      x2="1"
+      y2="1"
+    >
+      <stop stop-color="#7e5bef" />
+      <stop offset="1" stop-color="#4a90e2" />
+    </linearGradient>
+    
+    <filter
+      id="outerGlow"
+      x="-50%"
+      y="-50%"
+      width="200%"
+      height="200%"
+      color-interpolation-filters="sRGB"
+    >
+      <feDropShadow
+        dx="0"
+        dy="0"
+        stdDeviation="5"
+        flood-color="#7e5bef"
+        flood-opacity="0.6"
+      />
+      <feDropShadow
+        dx="0"
+        dy="0"
+        stdDeviation="8"
+        flood-color="#4a90e2"
+        flood-opacity="0.4"
+      />
+    </filter>
+    
+    <linearGradient id="polyGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#7e5bef" />
+      <stop offset="1" stop-color="#4a90e2" />
+    </linearGradient>
+    
+    <linearGradient id="textGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#bfa3ff" />
+      <stop offset="1" stop-color="#6b49ff" />
+    </linearGradient>
+  </defs>
+</svg>

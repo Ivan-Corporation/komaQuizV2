@@ -1,0 +1,9 @@
+{
+  "name": "First Quiz in History",
+  "description": "You completed your first quiz in the History category.",
+  "image": "ipfs://bafybeietbpdirsy3dr5gifrxkqblcysypzhk7zeig2a3eeysobdmruip2u/novice.png",
+  "attributes": [
+    { "trait_type": "Type", "value": "First Quiz" },
+    { "trait_type": "Category", "value": "History" }
+  ]
+}

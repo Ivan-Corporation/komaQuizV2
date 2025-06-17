@@ -7,13 +7,18 @@ import {
   Trophy,
   TrophyIcon,
   Users,
+  Settings,
 } from "lucide-react";
 import Button from "../UI/Button";
 import { useUserInfo } from "../hooks/useUserInfo";
+import { useEffect, useRef } from "react";
+import toast from "react-hot-toast";
 
 export default function Dashboard() {
   const userInfo = useUserInfo();
   const userLevel = userInfo?.level || 0;
+
+
 
   const actions = [
     {
@@ -37,6 +42,13 @@ export default function Dashboard() {
       icon: <TrophyIcon size={32} className="text-yellow-400" />,
       title: "Achievements",
       desc: "Achievements description and rewards",
+      locked: false,
+    },
+    {
+      to: "/settings",
+      icon: <Settings size={32} className="text-purple-400" />,
+      title: "Settings",
+      desc: "Change quiz model, settings, and more",
       locked: false,
     },
     {

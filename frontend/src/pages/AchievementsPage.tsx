@@ -1,8 +1,12 @@
 import { useUserInfo } from "../hooks/useUserInfo";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import {
+  mintAchievement,
+  mintRewardTokens,
+} from "../blockchain/rewardContract";
+import toast from "react-hot-toast";
 
-// You can extract this from your groupedCategories if desired
 const TOPICS = [
   "History",
   "Geography",
@@ -42,7 +46,6 @@ const TOPICS = [
   "Fun Facts",
 ];
 
-// Generate achievements dynamically
 const ALL_ACHIEVEMENTS = [
   "Novice",
   ...TOPICS.flatMap((topic) => [
@@ -52,6 +55,22 @@ const ALL_ACHIEVEMENTS = [
     `Master of ${topic}`,
   ]),
 ];
+
+// ONLY allow minting for these 3 for now
+const testMintableAchievements = new Set([
+  "Novice",
+  "First Quiz: History",
+  "Perfect Score: Mathematics",
+]);
+
+// CID mapping for those 3 test achievements
+const metadataMap: Record<string, string> = {
+  Novice: "ipfs://bafkreiabqoitpcwrkjtb3grm4vnjgh2nylxboetzahmxyhuqligah3saxq",
+  "First Quiz: History":
+    "ipfs://bafkreibvzqaax4hqcs5ann5fltxfzh7s3akp4su67dwyf2aq4fjp4ksn5u",
+  "Perfect Score: Mathematics":
+    "ipfs://bafkreifmek4vw4uptl4znqaa5mus3l6dbgocsdis3d54hjezleq5l46mli",
+};
 
 const parseAchievement = (key: string) => {
   if (key.startsWith("First Quiz: ")) {
@@ -130,6 +149,52 @@ export default function AchievementPage() {
     });
   });
 
+  const tokenRewards: Record<string, number> = {
+    Novice: 10,
+    "First Quiz: History": 5,
+    "Perfect Score: Mathematics": 20,
+  };
+
+  const handleMintReward = async (ach: any) => {
+    if (!user?.wallet_address) {
+      toast.error("Please connect your wallet first.");
+      return;
+    }
+
+    const uri = metadataMap[ach.id];
+    const tokenAmount = tokenRewards[ach.id];
+
+    if (!uri) {
+      toast.error("❌ This achievement is not available for NFT minting.");
+      return;
+    }
+    if (!tokenAmount) {
+      toast.error("❌ This achievement doesn't have a token reward.");
+      return;
+    }
+
+    try {
+      toast.loading("⏳ Minting achievement NFT...");
+      const txHashNFT = await mintAchievement(user.wallet_address, ach.id, uri);
+      toast.dismiss();
+      toast.success(`✅ NFT minted! TX: ${txHashNFT.slice(0, 8)}...`);
+
+      toast.loading("🎁 Sending KOMQ tokens...");
+      const txHashTokens = await mintRewardTokens(
+        user.wallet_address,
+        tokenAmount
+      );
+      toast.dismiss();
+      toast.success(
+        `💰 Rewarded ${tokenAmount} KOMQ! TX: ${txHashTokens.slice(0, 8)}...`
+      );
+    } catch (err) {
+      console.error("Minting failed:", err);
+      toast.dismiss();
+      toast.error("❌ Minting failed. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen px-4 py-10 bg-gradient-to-br from-[#0f0f0f] via-[#1a1a2e] to-[#0f0f0f] text-white">
       <div className="max-w-5xl mx-auto">
@@ -168,9 +233,21 @@ export default function AchievementPage() {
                   <div className="text-3xl mb-2">{ach.icon}</div>
                   <p className="font-medium text-lg">{ach.label}</p>
                   <p className="text-sm text-gray-300">{ach.description}</p>
-                  {!ach.unlocked && (
-                    <p className="text-xs mt-2 text-red-400 font-semibold">
+
+                  {!ach.unlocked ? (
+                    <p className="text-xs mt-2 text-red-400 font-semibold flex items-center gap-1">
                       🔒 Locked
+                    </p>
+                  ) : testMintableAchievements.has(ach.id) ? (
+                    <button
+                      className="w-full text-xs bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 cursor-pointer text-white px-3 py-1 rounded shadow transition"
+                      onClick={() => handleMintReward(ach)}
+                    >
+                      🎉 Mint NFT & Claim KOMQ
+                    </button>
+                  ) : (
+                    <p className="text-xs mt-2 text-gray-400 font-semibold">
+                      ⏳ Minting coming soon
                     </p>
                   )}
                 </motion.div>

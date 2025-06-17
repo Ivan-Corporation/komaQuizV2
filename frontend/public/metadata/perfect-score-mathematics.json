@@ -1,0 +1,9 @@
+{
+  "name": "Perfect Score in Mathematics",
+  "description": "You answered every question correctly in a Mathematics quiz.",
+  "image": "ipfs://bafybeietbpdirsy3dr5gifrxkqblcysypzhk7zeig2a3eeysobdmruip2u/novice.png",
+  "attributes": [
+    { "trait_type": "Type", "value": "Perfect Score" },
+    { "trait_type": "Category", "value": "Mathematics" }
+  ]
+}

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -15,11 +15,11 @@ class UserOut(BaseModel):
     achievements: List[str]
     level: int
     topic_experience: Dict[str, int]
-    wallet_address: str
+    wallet_address: Optional[str]
     
     class Config:
         orm_mode = True
 
 
 class WalletConnectRequest(BaseModel):
-    wallet_address: str
+    wallet_address: Optional[str]

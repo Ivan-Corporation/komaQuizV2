@@ -13,7 +13,9 @@ const difficultyMap: any = {
 
 export default function AIGeneratePage() {
   const [topic, setTopic] = useState("");
-  const [difficulty, setDifficulty] = useState("Easy");
+  const [difficulty, setDifficulty] = useState(() => {
+    return localStorage.getItem("quizDifficulty") || "Easy";
+  });
   const [numQuestions, setNumQuestions] = useState(3);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState<any>([]);
@@ -23,6 +25,21 @@ export default function AIGeneratePage() {
     "choose" | "loading" | "quiz" | "submitted"
   >("choose");
   const [searchQuery, setSearchQuery] = useState("");
+  const [modelApiUrl, setModelApiUrl] = useState<string | null>(null);
+  const [modelName, setModelName] = useState<string | null>(null);
+  const [promptTemplate, setPromptTemplate] = useState<string | null>(null);
+  const [hfToken, setHfToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedModel = localStorage.getItem("quizModelName");
+    const storedUrl = localStorage.getItem("quizModelApiUrl");
+    const storedPrompt = localStorage.getItem("quizPromptTemplate");
+    const storedToken = localStorage.getItem("hfToken");
+    setModelName(storedModel);
+    setModelApiUrl(storedUrl);
+    setPromptTemplate(storedPrompt);
+    setHfToken(storedToken)
+  }, []);
 
   const filteredCategories = Object.entries(groupedCategories).reduce(
     (acc: any, [group, cats]) => {
@@ -39,6 +56,7 @@ export default function AIGeneratePage() {
   const [totalTime, setTotalTime] = useState(difficultyMap[difficulty].time);
 
   useEffect(() => {
+    localStorage.setItem("quizDifficulty", difficulty);
     setNumQuestions(difficultyMap[difficulty].count);
     setTimeLeft(difficultyMap[difficulty].time);
     setTotalTime(difficultyMap[difficulty].time);
@@ -66,6 +84,10 @@ export default function AIGeneratePage() {
       const res = await api.post("/generate-quiz", {
         topic,
         num_questions: numQuestions,
+        model_api_url: modelApiUrl || undefined,
+        model_name: modelName || undefined,
+        prompt_template: promptTemplate || undefined,
+        hf_token: hfToken || undefined,
       });
       setQuestions(res.data);
       setAnswers(new Array(res.data.length).fill(-1));
@@ -163,7 +185,18 @@ export default function AIGeneratePage() {
                 ))}
               </div>
             </div>
-
+            <div className="text-center mb-4 text-sm text-gray-400">
+              <p>
+                <span className="text-cyan-400">Model:</span>{" "}
+                {modelName || "Default (OpenAI GPT-4o)"}
+              </p>
+              <a
+                href="/settings"
+                className="text-indigo-400 underline hover:text-indigo-300 mt-1 inline-block"
+              >
+                Change model in Settings
+              </a>
+            </div>
             <div className="text-center mb-8">
               <Button
                 onClick={handleGenerate}

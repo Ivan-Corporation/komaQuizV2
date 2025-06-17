@@ -133,3 +133,5 @@ dmypy.json
 .vscode/*
 !.vscode/launch.json
 pyrightconfig.json
+
+node_modules

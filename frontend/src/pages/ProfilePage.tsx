@@ -2,9 +2,12 @@ import { useEffect, useState, type Key } from "react";
 import api from "../api/axios";
 import { Link } from "react-router-dom";
 import AiAnalyticsDashboard from "../components/AiAnalyticsDashboard";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { useUserInfo } from "../hooks/useUserInfo"; // make sure path is correct
 import { useAppKitAccount } from "@reown/appkit/react";
+import { useTokenBalance } from "../hooks/useTokenBalance";
+import tokenIcon from "../assets/KOMQ.svg";
+
 
 interface Submission {
   id: number;
@@ -72,6 +75,15 @@ export default function ProfilePage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const { address, isConnected } = useAppKitAccount();
+  const balance = useTokenBalance(user?.wallet_address);
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start({
+      scale: [1, 1.3, 1],
+      transition: { duration: 1.5, repeat: Infinity, repeatType: "loop" },
+    });
+  }, [controls]);
 
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -100,43 +112,76 @@ export default function ProfilePage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mb-6 p-6 rounded-xl bg-[#1f1f1f] border border-gray-700 text-white shadow-md"
+            className="relative mb-6 p-6 rounded-xl bg-[#1f1f1f] border border-gray-700 text-white shadow-md"
           >
-            <h2 className="text-xl font-semibold mb-2">Profile</h2>
-            <p className="text-sm text-gray-300 flex items-center gap-2">
-              <span className="font-medium text-white">Wallet:</span>{" "}
-              {isConnected ? (
-                <>
-                  <span className="text-green-400 truncate max-w-[160px]">
-                    {address}
-                  </span>
-                  <span className="bg-green-600 text-white text-[8px] px-2 py-0.5 rounded-full">
-                    Connected
-                  </span>
-                </>
-              ) : (
-                <span className="bg-red-600 text-white text-[8px] px-2 py-0.5 rounded-full">
-                  Disconnected
-                </span>
-              )}
-            </p>
-            <p className="text-sm text-gray-300">
-              <span className="font-medium text-white">Email:</span>{" "}
-              {user.email}
-            </p>
 
-            <p className="text-sm text-gray-300">
-              <span className="font-medium text-white">Joined:</span>{" "}
-              {new Date(user.created_at).toLocaleDateString()}
-            </p>
-            <p className="text-sm text-gray-300">
-              <span className="font-medium text-white">Level:</span>{" "}
-              {user.level}
-            </p>
-            <p className="text-sm text-gray-300">
-              <span className="font-medium text-white">XP:</span>{" "}
-              {user.experience_points}
-            </p>
+
+            {/* Profile Info */}
+            <div className="space-y-2 max-w-full">
+              <h2 className="text-xl font-semibold mb-2">Profile</h2>
+              <p className="text-sm text-gray-300 flex items-center gap-2">
+                <span className="font-medium text-white">Wallet:</span>{" "}
+                {isConnected ? (
+                  <>
+                    <span className="text-green-400 truncate max-w-[160px]">
+                      {address}
+                    </span>
+                    <span className="bg-green-600 text-white text-[8px] px-2 py-0.5 rounded-full">
+                      Connected
+                    </span>
+                  </>
+                ) : (
+                  <span className="bg-red-600 text-white text-[8px] px-2 py-0.5 rounded-full">
+                    Disconnected
+                  </span>
+                )}
+              </p>
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">Email:</span>{" "}
+                {user.email}
+              </p>
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">Joined:</span>{" "}
+                {new Date(user.created_at).toLocaleDateString()}
+              </p>
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">Level:</span>{" "}
+                {user.level}
+              </p>
+              <p className="text-sm text-gray-300">
+                <span className="font-medium text-white">XP:</span>{" "}
+                {user.experience_points}
+              </p>
+            </div>
+
+                        {/* Tokens Block */}
+            <motion.div
+              animate={{
+                background:
+                  "linear-gradient(135deg, #4f39f6, #4b0082, #1e3c72, #1e40af)", // dark purple-blue gradient
+                boxShadow: "0 0 10px #4b0082, 0 0 20px #1e3c72",
+              }}
+              whileHover={{
+                boxShadow: "0 0 30px #7e5bef, 0 0 60px #00d2ff",
+                scale: 1.05,
+                transition: { duration: 0.3 },
+              }}
+              className="md:absolute md:top-4 md:right-4 flex items-center gap-3 px-5 py-3 rounded-2xl cursor-default select-none mt-4 md:mt-0 mb-2"
+              style={{ minWidth: "160px" }}
+            >
+              <img src={tokenIcon} alt="KOMQ Token Icon" className="w-12 h-12" />
+              <div>
+                <div className="text-xs uppercase font-semibold tracking-widest text-white/80">
+                  KOMQ Tokens
+                </div>
+                <motion.div
+                  animate={controls}
+                  className="lg:text-3xl text-base font-extrabold text-white leading-none"
+                >
+                  {balance}
+                </motion.div>
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Achievements */}

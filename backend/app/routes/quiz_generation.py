@@ -4,14 +4,18 @@ import re
 import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List
-from app.config import HUGGING_FACE_TOKEN  # Ensure you define this or load via env
+from typing import List, Optional
+from app.config import HUGGING_FACE_TOKEN  # Your server token
 
 router = APIRouter(tags=["AI Quiz Generator"])
 
 class QuizRequest(BaseModel):
     topic: str
     num_questions: int = 5
+    model_api_url: Optional[str] = None
+    model_name: Optional[str] = None
+    prompt_template: Optional[str] = None
+    hf_token: Optional[str] = None  # User token (optional)
 
 class QuizQuestion(BaseModel):
     question: str
@@ -47,53 +51,83 @@ def parse_quiz_from_text(text: str) -> List[QuizQuestion]:
 
     return quiz
 
+def get_auth_header(token: Optional[str]):
+    final_token = token or HUGGING_FACE_TOKEN
+    return {
+        "Authorization": f"Bearer {final_token}",
+        "Content-Type": "application/json",
+    }
+
 @router.post("/generate-quiz", response_model=List[QuizQuestion])
 async def generate_quiz(data: QuizRequest):
-    prompt = build_prompt(data.topic, data.num_questions)
+    DEFAULT_HF_URL = "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta/v1/chat/completions"
+    DEFAULT_MODEL_NAME = "HuggingFaceH4/zephyr-7b-beta"
 
-    # Try local model first
+    # Construct prompt
+    try:
+        prompt = data.prompt_template.format(topic=data.topic, count=data.num_questions) \
+            if data.prompt_template else build_prompt(data.topic, data.num_questions)
+    except KeyError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid prompt template: missing {e}")
+
+    # 1. Try local model first
     try:
         async with httpx.AsyncClient() as client:
             local_response = await client.post(
                 "http://localhost:5005/generate",
                 json={"prompt": prompt},
-                timeout=60,
+                timeout=260,
             )
             if local_response.status_code == 200:
                 output = local_response.json()["text"]
-                try:
-                    return parse_quiz_from_text(output)
-                except Exception as parse_error:
-                    raise ValueError(f"Local model output could not be parsed: {parse_error}")
+                return parse_quiz_from_text(output)
     except Exception as local_error:
-        print("⚠️ Local model failed, falling back to Hugging Face API:", local_error)
+        print("⚠️ Local model failed:", local_error)
 
-    # Fallback to Hugging Face API
+    # 2. Try custom Hugging Face model if provided
+    if data.model_api_url and data.model_name:
+        try:
+            async with httpx.AsyncClient() as client:
+                hf_response = await client.post(
+                    data.model_api_url,
+                    headers=get_auth_header(data.hf_token),
+                    json={
+                        "model": data.model_name,
+                        "messages": [{"role": "user", "content": prompt}],
+                        "stream": False,
+                    },
+                    timeout=60.0,
+                )
+                if hf_response.status_code == 200:
+                    result = hf_response.json()
+                    generated = result["choices"][0]["message"]["content"]
+                    return parse_quiz_from_text(generated)
+                else:
+                    print("⚠️ Custom model call failed:", hf_response.text)
+        except Exception as custom_error:
+            print("⚠️ Custom Hugging Face model failed:", custom_error)
+
+    # 3. Fallback to default Hugging Face Zephyr model
     try:
         async with httpx.AsyncClient() as client:
             hf_response = await client.post(
-                "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {HUGGING_FACE_TOKEN}",
-                    "Content-Type": "application/json",
-                },
+                DEFAULT_HF_URL,
+                headers=get_auth_header(data.hf_token),
                 json={
-                    "model": "HuggingFaceH4/zephyr-7b-beta",
+                    "model": DEFAULT_MODEL_NAME,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream": False,
                 },
                 timeout=60.0,
             )
-
-        if hf_response.status_code != 200:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Hugging Face API error: {hf_response.status_code}: {hf_response.text}",
-            )
-
-        result = hf_response.json()
-        generated = result["choices"][0]["message"]["content"]
-        return parse_quiz_from_text(generated)
-
+            if hf_response.status_code == 200:
+                result = hf_response.json()
+                generated = result["choices"][0]["message"]["content"]
+                return parse_quiz_from_text(generated)
+            else:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Default HF model failed: {hf_response.status_code}: {hf_response.text}",
+                )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate quiz: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate quiz from all sources: {e}")

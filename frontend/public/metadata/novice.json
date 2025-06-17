@@ -1,0 +1,15 @@
+{
+  "name": "Novice",
+  "description": "Earned 100+ total experience points.",
+  "image": "ipfs://bafybeietbpdirsy3dr5gifrxkqblcysypzhk7zeig2a3eeysobdmruip2u/novice.png",
+  "attributes": [
+    {
+      "trait_type": "Tier",
+      "value": "Novice"
+    },
+    {
+      "trait_type": "XP Threshold",
+      "value": "100+"
+    }
+  ]
+}
