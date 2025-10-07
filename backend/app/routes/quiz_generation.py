@@ -107,7 +107,7 @@ async def generate_quiz(data: QuizRequest):
         except Exception as custom_error:
             print("⚠️ Custom Hugging Face model failed:", custom_error)
 
-    # 3. Fallback to default Hugging Face Zephyr model
+    # 3. Fallback to default Hugging Face LLama model
     try:
         async with httpx.AsyncClient() as client:
             hf_response = await client.post(

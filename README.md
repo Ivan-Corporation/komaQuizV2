@@ -121,6 +121,17 @@ cp .env.example .env
 npm run dev
 ```
 
+
+### 4. Local model (optional)
+```
+cd backend
+
+.\venv\Scripts\Activate.ps1
+
+uvicorn app.localModelAI.local_model_server:app --host 0.0.0.0 --port 5005 --log-level debug
+
+```
+
 Frontend runs at: [http://localhost:5173](http://localhost:5173)
 
 ## 📋 Environment Variables
