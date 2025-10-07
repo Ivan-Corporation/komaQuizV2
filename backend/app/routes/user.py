@@ -29,6 +29,16 @@ def connect_wallet(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    current_user.wallet_address = data.wallet_address.lower()
+    wallet = data.wallet_address.lower()
+
+    existing_user = db.query(User).filter(User.wallet_address == wallet).first()
+    if existing_user and existing_user.id != current_user.id:
+        raise HTTPException(
+            status_code=400,
+            detail="This wallet address is already connected to another account.",
+        )
+
+    current_user.wallet_address = wallet
     db.commit()
-    return {"message": "Wallet connected successfully"}
+    db.refresh(current_user)
+    return {"message": "Wallet connected successfully", "wallet": current_user.wallet_address}

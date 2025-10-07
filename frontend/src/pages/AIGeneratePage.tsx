@@ -188,7 +188,7 @@ export default function AIGeneratePage() {
             <div className="text-center mb-4 text-sm text-gray-400">
               <p>
                 <span className="text-cyan-400">Model:</span>{" "}
-                {modelName || "Default (OpenAI GPT-4o)"}
+                {modelName || "Default (meta-llama/Llama-3.1-8B-Instruct)"}
               </p>
               <a
                 href="/settings"

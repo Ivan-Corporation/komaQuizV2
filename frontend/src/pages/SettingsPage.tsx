@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 const DEFAULT_MODEL_API_URL =
-  "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta/v1/chat/completions";
-const DEFAULT_MODEL_NAME = "HuggingFaceH4/zephyr-7b-beta";
+  "https://router.huggingface.co/v1/chat/completions";
+const DEFAULT_MODEL_NAME = "meta-llama/Llama-3.1-8B-Instruct";
 
 const DEFAULT_PROMPT_TEMPLATE = `Create {count} multiple choice quiz questions about '{topic}'.
 Format:
@@ -91,7 +91,7 @@ export default function SettingsPage() {
             value={modelName}
             onChange={(e) => setModelName(e.target.value)}
             className="w-full mt-2 p-3 rounded-lg bg-[#1f2937] border border-gray-700 text-white"
-            placeholder="e.g. deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+            placeholder="e.g. meta-llama/Llama-3.1-8B-Instruct"
           />
         </label>
 
@@ -167,19 +167,19 @@ export default function SettingsPage() {
           Example:
         </p>
         <code className="block bg-black p-3 rounded-lg text-green-400 overflow-auto">
-          {`https://router.huggingface.co/hf-inference/models/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B/v1/chat/completions`}
+          {`https://router.huggingface.co/v1/chat/completions`}
         </code>
 
         <p className="text-gray-400">Example Python code using requests:</p>
         <pre className="bg-black text-green-400 p-4 rounded-md overflow-auto text-xs">
           {`import os, requests
 
-API_URL = "https://router.huggingface.co/hf-inference/models/deepseek-ai/DeepSeek-R1-Distill-Qwen-32B/v1/chat/completions"
+API_URL = "https://router.huggingface.co/v1/chat/completions"
 headers = { "Authorization": f"Bearer YOUR_HF_TOKEN" }
 
 payload = {
   "messages": [{"role": "user", "content": "What is the capital of France?"}],
-  "model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+  "model": "meta-llama/Llama-3.1-8B-Instruct"
 }
 
 response = requests.post(API_URL, headers=headers, json=payload)

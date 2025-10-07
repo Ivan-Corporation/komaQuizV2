@@ -60,8 +60,8 @@ def get_auth_header(token: Optional[str]):
 
 @router.post("/generate-quiz", response_model=List[QuizQuestion])
 async def generate_quiz(data: QuizRequest):
-    DEFAULT_HF_URL = "https://router.huggingface.co/hf-inference/models/HuggingFaceH4/zephyr-7b-beta/v1/chat/completions"
-    DEFAULT_MODEL_NAME = "HuggingFaceH4/zephyr-7b-beta"
+    DEFAULT_HF_URL = "https://router.huggingface.co/v1/chat/completions"
+    DEFAULT_MODEL_NAME = "meta-llama/Llama-3.1-8B-Instruct"
 
     # Construct prompt
     try:
